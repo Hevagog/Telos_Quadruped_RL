@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<robot name="telos" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- ros_control plugin -->
+<gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/telos</robotNamespace>
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+</gazebo>
+
+<gazebo>
+    <plugin name="move" filename="move_plugin.so"/>
+</gazebo>
+
+<!-- Constants for robot dimensions -->
+<xacro:property name="PI" value="3.1415926535897931"/>
+
+<xacro:property name="rangeRotator" value="1.253294755"/>
+<xacro:property name="rangeThigh" value="1.253294755"/>
+<xacro:property name="rangeFeet" value="0.785"/>
+
+<xacro:property name="rotatorReduction" value="1.88"/>
+<xacro:property name="thighReduction" value="1.88"/>
+<xacro:property name="feetReduction" value="1.5"/>
+
+
+<xacro:property name="corpusMass" value="2.5"/>
+<xacro:property name="thighMass" value="0.2"/>
+<xacro:property name="feetMass" value="0.1"/>
+
+<xacro:property name="corpusHeight" value="0.052"/>
+<xacro:property name="corpusWidth" value="0.1"/>
+<xacro:property name="corpusDepth" value="0.39"/>
+
+<xacro:property name="rotatorSize" value="0.0000000000001"/>
+
+<xacro:property name="legHeight" value="0.02"/>
+<xacro:property name="legWidth" value="0.02"/>
+<xacro:property name="legDepth" value="0.145"/>
+<xacro:property name="feetOriginY" value="-0.0625"/>
+
+<!-- Import Rviz colors -->
+<xacro:include filename="$(find rrbot_description)/urdf/materials.xacro" />
+
+<!-- Inertia for Thigh and feet -->
+<xacro:macro name="default_inertial_thigh">
+    <inertial>
+        <mass value="${thighMass}"/>
+        <inertia ixx="0.002816668" ixy="0.0" ixz="0.0"
+         iyy="0.0002129168" iyz="0.0" izz="0.0002816668"/>
+    </inertial>
+</xacro:macro>
+    
+<xacro:macro name="default_inertial_feet" >
+    <inertial>
+        <mass value="${feetMass}"/>
+        <inertia ixx="0.000704167" ixy="0.0" ixz="0.0"
+         iyy="0.0000532292" iyz="0.0" izz="0.0000704167"/>
+    </inertial>
+</xacro:macro>
+
+<!-- <link name="base_link"/>
+    
+<joint name="fixed" type="fixed">
+    <parent link="base_link"/>
+    ACHTUNG
+    <child link="corpus"/>
+    <origin xyz="0.0 0.0 0.0"/>
+</joint> -->
+
+<link name="base_link">
+        <visual>
+            <geometry>
+                <box size=".1 0.39 0.052"/>
+                <box size="${corpusWidth} ${corpusDepth} ${corpusHeight}"/>
+            </geometry>
+            <origin rpy="0.0 0.0 0.0" xyz="0 0 0"/>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${corpusWidth} ${corpusDepth} ${corpusHeight}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="${corpusMass}"/>
+            <inertia ixx="0.032250833" ixy="0.0" ixz="0.0"
+            iyy="0.002646667" iyz="0.0" izz="0.033770833"/>
+        </inertial>
+</link> 
+
+<xacro:macro name="thigh" params="side direction oX oY oZ">
+    <link name="${side}_${direction}_thigh">
+        <visual>
+            <geometry>
+                <box size="${legWidth} ${legDepth} ${legHeight}"/>
+            </geometry>
+            <origin xyz="${oX} ${oY} ${oZ}"/>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${legWidth} ${legDepth} ${legHeight}"/>
+            </geometry>
+        </collision>
+        <xacro:default_inertial_thigh/>
+    </link>
+
+    <joint name="corpus_to_${side}_${direction}_thigh" type="revolute">
+        <axis xyz="1 0.0 0.0"/>
+        <limit lower="-${rangeThigh}" upper="${rangeThigh}" effort="1000.0" velocity="0.5"/>
+        <parent link="base_link"/>
+        <child link="${side}_${direction}_thigh"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.785 0.0 0.0"/>
+    </joint>
+
+    <transmission name="${side}_${direction}_thigh_transmission">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="corpus_to_${side}_${direction}_thigh">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="${side}_${direction}_thigh_motor">
+            <mechanicalReduction>"${thighReduction}"</mechanicalReduction>
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </actuator>
+    </transmission>
+
+</xacro:macro>
+
+<xacro:macro name="feet" params="side direction oX oY oZ">
+    <link name="${side}_${direction}_feet">
+        <visual>
+            <geometry>
+                <box size="${legWidth} ${legDepth} ${legHeight}"/>
+            </geometry>
+            <origin xyz="0.0 ${feetOriginY} 0.0"/>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${legWidth} ${legDepth} ${legHeight}"/>
+            </geometry>
+        </collision>
+        <xacro:default_inertial_feet/>
+    </link>
+
+    <joint name="thigh_to_${side}_${direction}_feet" type="revolute">
+        <axis xyz="1 0.0 0.0"/>
+        <limit lower="-${rangeFeet}" upper="${rangeFeet}" effort="1000.0" velocity="0.5"/>
+        <parent link="${side}_${direction}_thigh"/>
+        <child link="${side}_${direction}_feet"/>
+        <origin xyz="${oX} ${oY} ${oZ}" rpy="1.57 0.0 0.0"/>
+    </joint>
+
+    <transmission name="${side}_${direction}_feet_transmission">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="thigh_to_${side}_${direction}_feet">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="${side}_${direction}_feet_motor">
+            <mechanicalReduction>"${feetReduction}"</mechanicalReduction>
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </actuator>
+    </transmission>
+
+</xacro:macro>
+<xacro:thigh   side="right" direction="front" oX="0.06" oY=".15" oZ="0"/> 
+<xacro:feet    side="right" direction="front" oX="0"    oY="-0.125"  oZ="0"/>
+
+<xacro:thigh   side="left" direction="front" oX="-0.06" oY=".15" oZ="0"/> 
+<xacro:feet    side="left" direction="front" oX="0"    oY="-0.125"  oZ="0"/>
+
+<xacro:thigh   side="right" direction="back" oX="0.06" oY="-.15" oZ="0"/> 
+<xacro:feet    side="right" direction="back" oX="0"    oY="-0.125"  oZ="0"/>
+
+<xacro:thigh   side="left" direction="back" oX="-0.06" oY="-.15" oZ="0"/> 
+<xacro:feet    side="left" direction="back" oX="0"    oY="-0.125"  oZ="0"/>
+
+</robot>

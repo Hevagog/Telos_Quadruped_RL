@@ -1,0 +1,622 @@
+<?xml version="1.0" ?>
+<robot name="SImple">
+
+<material name="silver">
+  <color rgba="0.700 0.700 0.700 1.000"/>
+</material>
+
+<link name="base_link">
+  <inertial>
+    <origin xyz="-0.09750467064811716 0.19962276254002817 0.31491351895180236" rpy="1.5707963267948966 0 0"/>
+    <mass value="0.3031669308680312"/>
+    <inertia ixx="0.0005505017789097927" iyy="0.005709060760786866" izz="0.005396693941690433" ixy="3.0904543612663565e-07" iyz="6.938893903907228e-17" ixz="2.949029909160572e-17"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="1.5707963267948966 0 0"/>
+    <geometry>
+      <mesh filename="meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Hip_bare_1_v11">
+  <inertial>
+    <origin xyz="-0.027145298874750975 -0.04268398650994429 -0.018600467427111522" rpy="0 0 0"/>
+    <mass value="0.04858629943894289"/>
+    <inertia ixx="0.00010553112243222177" iyy="5.3089180298015754e-05" izz="0.00013695057408792764" ixy="-5.600026810017808e-05" iyz="-7.031476495413663e-07" ixz="-4.4717042108917806e-07"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.052686 -0.199664 -0.177074" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="-0.052686 -0.199664 -0.177074" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="LegXIVII.base4_bare_1_v1_11">
+  <inertial>
+    <origin xyz="0.091371866785443 -0.07389492447816426 -0.014098452292628294" rpy="0 0 0"/>
+    <mass value="0.08449563970821981"/>
+    <inertia ixx="0.0003064398351938975" iyy="0.00042312079866349767" izz="0.0007199597171141535" ixy="0.00034763957562943546" iyz="-1.1766974810739584e-08" ixz="-5.592299225695013e-10"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.025126 -0.077311 -0.172774" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.025126 -0.077311 -0.172774" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_bare_1_v1_11">
+  <inertial>
+    <origin xyz="-0.22768975807108333 0.03920519656322799 -0.23777048666446757" rpy="0 0 0"/>
+    <mass value="0.10292302681608799"/>
+    <inertia ixx="9.8662156003234e-05" iyy="7.669371967806461e-05" izz="9.046452156840148e-05" ixy="5.6789916856765654e-08" iyz="-1.1913745138663126e-05" ixz="-9.225282421288471e-08"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.28035 -0.181978 -0.455147" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="-0.28035 -0.181978 -0.455147" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_socket_bare_1_v1_11">
+  <inertial>
+    <origin xyz="0.029906912829981917 0.01730796156851841 -0.03490073237561614" rpy="0 0 0"/>
+    <mass value="0.04120622977897054"/>
+    <inertia ixx="4.325547653287378e-05" iyy="6.909766024439795e-05" izz="5.4350493723227334e-05" ixy="8.84435406019277e-07" iyz="4.863873318888476e-07" ixz="-1.3599599603517e-06"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.023611 -0.181664 -0.287739" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="-0.023611 -0.181664 -0.287739" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="LegXIVII.base4_bare_1_v11">
+  <inertial>
+    <origin xyz="0.11676865496292671 -0.01321576987793438 -0.014083709221932306" rpy="0 0 0"/>
+    <mass value="0.08449563970821981"/>
+    <inertia ixx="2.5011136382658335e-05" iyy="0.0007045494935439905" izz="0.000719959721044876" ixy="9.388173925513349e-05" iyz="6.62879807674429e-09" ixz="-9.681232715388725e-08"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.252816 -0.052135 -0.172935" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.252816 -0.052135 -0.172935" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Hip_bare_1_v1_11">
+  <inertial>
+    <origin xyz="-0.0028262346413686357 -0.05052602032811451 -0.018545195386326097" rpy="0 0 0"/>
+    <mass value="0.04858629943894289"/>
+    <inertia ixx="0.00014075910999092247" iyy="1.7859515487677995e-05" izz="0.0001369522513395647" ixy="-6.898947769041824e-06" iyz="-7.017585620236119e-07" ixz="-3.9009334572466525e-08"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.244564 -0.199609 -0.177074" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.244564 -0.199609 -0.177074" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v1_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_bare_1_v11">
+  <inertial>
+    <origin xyz="-0.2276897580710801 -0.2494559673569329 -0.237794013264567" rpy="0 0 0"/>
+    <mass value="0.10292302681608799"/>
+    <inertia ixx="9.866215600323573e-05" iyy="7.666767933541332e-05" izz="9.049056191105624e-05" ixy="5.668899876170447e-08" iyz="-1.1898657433919574e-05" ixz="-9.231487232020524e-08"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.0169 -0.470628 -0.455147" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.0169 -0.470628 -0.455147" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_socket_bare_1_v11">
+  <inertial>
+    <origin xyz="0.02990691282998409 0.01730796156851863 -0.020710732375615715" rpy="0 0 0"/>
+    <mass value="0.04120622977897054"/>
+    <inertia ixx="4.3255476532872913e-05" iyy="6.909766024439969e-05" izz="5.4350493723227984e-05" ixy="8.844354060194397e-07" iyz="4.863873318888476e-07" ixz="-1.3599599603510495e-06"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.273639 -0.181664 -0.273549" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.273639 -0.181664 -0.273549" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Hip_bare_1_v1Mirror_11">
+  <inertial>
+    <origin xyz="-4.630972996744198e-08 -0.050584500193273485 0.018599505330694655" rpy="-1.5707963267948966 0 0"/>
+    <mass value="0.048586299438942826"/>
+    <inertia ixx="0.00014114516855578442" iyy="1.7475134174455703e-05" izz="0.00013695057408792417" ixy="-1.5413251816358275e-10" iyz="8.332934672392218e-07" ixz="-3.020104999418294e-12"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.244564 -0.199664 -0.452754" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.244564 -0.199664 -0.452754" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="LegXIVII.base4_bare_1_v1Mirror2">
+  <inertial>
+    <origin xyz="0.11727171805355044 -0.007518881036474731 -0.014102510433110282" rpy="0 0 0"/>
+    <mass value="0.08449564222418197"/>
+    <inertia ixx="1.7511156432472447e-05" iyy="0.0007120494893299439" izz="0.0007199597268837555" ixy="6.05063289722379e-05" iyz="9.927357059015887e-09" ixz="-6.345751103406516e-09"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.244564 -0.054664 -0.484854" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v1Mirror2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.244564 -0.054664 -0.484854" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v1Mirror2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_socket_bare_1_v1Mirror_11">
+  <inertial>
+    <origin xyz="0.02990680133623245 0.017308057724288367 0.034900016334206085" rpy="0 0 0"/>
+    <mass value="0.04120661127616922"/>
+    <inertia ixx="4.325611180009542e-05" iyy="6.90984599459668e-05" izz="5.435104340461238e-05" ixy="8.844813634335835e-07" iyz="-4.864903480139918e-07" ixz="1.360082640901772e-06"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.023611 -0.181664 -0.342089" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="-0.023611 -0.181664 -0.342089" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_bare_1_v1Mirror_11">
+  <inertial>
+    <origin xyz="-0.22768975811316028 0.04780520130723759 -0.39205648109134" rpy="0 0 0"/>
+    <mass value="0.10292297488236483"/>
+    <inertia ixx="9.866212277473418e-05" iyy="7.669361517241569e-05" izz="9.046444386262564e-05" ixy="5.678984782995014e-08" iyz="1.1913732534934302e-05" ixz="9.225279835921654e-08"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.28035 -0.173378 -0.804507" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="-0.28035 -0.173378 -0.804507" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_socket_bare_1_v1Mirror2">
+  <inertial>
+    <origin xyz="0.029906801336234717 0.017308057724289172 0.034900016334205974" rpy="0 0 0"/>
+    <mass value="0.04120661127616922"/>
+    <inertia ixx="4.3256111800097155e-05" iyy="6.909845994596854e-05" izz="5.435104340460999e-05" ixy="8.844813634326619e-07" iyz="-4.864903480144254e-07" ixz="1.3600826409003626e-06"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.273639 -0.181664 -0.342089" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v1Mirror2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.273639 -0.181664 -0.342089" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_socket_bare_1_v1Mirror2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="shoulder_bare_1_v1Mirror2">
+  <inertial>
+    <origin xyz="-0.22768975811315786 -0.24944479869276187 -0.3920564810913404" rpy="0 0 0"/>
+    <mass value="0.10292297488236483"/>
+    <inertia ixx="9.866212277472725e-05" iyy="7.669361517241569e-05" izz="9.046444386262738e-05" ixy="5.6789847832118545e-08" iyz="1.1913732534934302e-05" ixz="9.225279835531341e-08"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.0169 -0.470628 -0.804507" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v1Mirror2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.0169 -0.470628 -0.804507" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/shoulder_bare_1_v1Mirror2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="Hip_bare_1_v1Mirror1">
+  <inertial>
+    <origin xyz="-0.027206548786188747 -0.042644972148695476 0.01859950533069571" rpy="0 0 0"/>
+    <mass value="0.048586299438942826"/>
+    <inertia ixx="0.00010537022411207832" iyy="5.32500786181566e-05" izz="0.00013695057408793045" ixy="-5.6075323979598026e-05" iyz="7.025049573740859e-07" ixz="4.481794143158758e-07"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.052686 -0.199664 -0.452754" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v1Mirror1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="-0.052686 -0.199664 -0.452754" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/Hip_bare_1_v1Mirror1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="LegXIVII.base4_bare_1_v1Mirror_11">
+  <inertial>
+    <origin xyz="0.0948209437170567 -0.06941209849616288 -0.014102510433109727" rpy="0 0 0"/>
+    <mass value="0.08449564222418197"/>
+    <inertia ixx="0.00027329494020243705" iyy="0.00045626570555997933" izz="0.0007199597268837671" ixy="0.0003404222592131999" iyz="1.1782226762811765e-08" ixz="-1.037923696642351e-11"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.025301 -0.077422 -0.484854" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+    <material/>
+  </visual>
+  <collision>
+    <origin xyz="0.025301 -0.077422 -0.484854" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/LegXIVII.base4_bare_1_v1Mirror_11.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="Revolute_2" type="revolute">
+  <origin xyz="-0.227664 0.017686 -0.278073" rpy="0 0 0"/>
+  <parent link="shoulder_bare_1_v1_11"/>
+  <child link="Hip_bare_1_v11"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+  <limit upper="1.308997" lower="-1.308997" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_2_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_2">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_2_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_3" type="revolute">
+  <origin xyz="-0.077812 -0.122353 -0.0043" rpy="0 0 0"/>
+  <parent link="Hip_bare_1_v11"/>
+  <child link="LegXIVII.base4_bare_1_v1_11"/>
+  <axis xyz="0.0 0.0 -1.0"/>
+  <limit upper="2.268928" lower="-0.349066" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_3_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_3">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_3_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_4" type="revolute">
+  <origin xyz="0.256739 0.000314 0.167408" rpy="0 0 0"/>
+  <parent link="shoulder_socket_bare_1_v1_11"/>
+  <child link="shoulder_bare_1_v1_11"/>
+  <axis xyz="1.0 -0.0 0.0"/>
+  <limit upper="1.047198" lower="-1.570796" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_4_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_4">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_4_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Rigid_6" type="fixed">
+  <origin xyz="0.023611 0.181664 0.287739" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="shoulder_socket_bare_1_v1_11"/>
+</joint>
+
+<joint name="Revolute_7" type="revolute">
+  <origin xyz="-0.008252 -0.147474 -0.004139" rpy="0 0 0"/>
+  <parent link="Hip_bare_1_v1_11"/>
+  <child link="LegXIVII.base4_bare_1_v11"/>
+  <axis xyz="-0.0 0.001094 0.999999"/>
+  <limit upper="0.872665" lower="-2.792527" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_7_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_7">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_7_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_8" type="revolute">
+  <origin xyz="-0.227664 -0.271019 -0.278073" rpy="0 0 0"/>
+  <parent link="shoulder_bare_1_v11"/>
+  <child link="Hip_bare_1_v1_11"/>
+  <axis xyz="0.0 0.001094 0.999999"/>
+  <limit upper="1.308997" lower="-1.308997" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_8_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_8">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_8_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_9" type="revolute">
+  <origin xyz="0.256739 0.288964 0.181598" rpy="0 0 0"/>
+  <parent link="shoulder_socket_bare_1_v11"/>
+  <child link="shoulder_bare_1_v11"/>
+  <axis xyz="-1.0 0.0 -0.0"/>
+  <limit upper="1.570796" lower="-1.047198" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_9_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_9">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_9_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Rigid_10" type="fixed">
+  <origin xyz="-0.273639 0.181664 0.273549" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="shoulder_socket_bare_1_v11"/>
+</joint>
+
+<joint name="Revolute_19" type="revolute">
+  <origin xyz="-0.227664 -0.270964 -0.351753" rpy="0 0 0"/>
+  <parent link="shoulder_bare_1_v1Mirror2"/>
+  <child link="Hip_bare_1_v1Mirror_11"/>
+  <axis xyz="-0.0 0.0 1.0"/>
+  <limit upper="1.308997" lower="-1.308997" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_19_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_19">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_19_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_20" type="revolute">
+  <origin xyz="0.0 -0.145 0.0321" rpy="0 0 0"/>
+  <parent link="Hip_bare_1_v1Mirror_11"/>
+  <child link="LegXIVII.base4_bare_1_v1Mirror2"/>
+  <axis xyz="-0.0 0.0 1.0"/>
+  <limit upper="0.349066" lower="-2.268928" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_20_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_20">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_20_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Rigid_21" type="fixed">
+  <origin xyz="0.023611 0.181664 0.342089" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="shoulder_socket_bare_1_v1Mirror_11"/>
+</joint>
+
+<joint name="Revolute_22" type="revolute">
+  <origin xyz="0.256739 -0.008286 0.462418" rpy="0 0 0"/>
+  <parent link="shoulder_socket_bare_1_v1Mirror_11"/>
+  <child link="shoulder_bare_1_v1Mirror_11"/>
+  <axis xyz="-1.0 0.0 -0.0"/>
+  <limit upper="1.047198" lower="-1.570796" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_22_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_22">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_22_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Rigid_23" type="fixed">
+  <origin xyz="-0.273639 0.181664 0.342089" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="shoulder_socket_bare_1_v1Mirror2"/>
+</joint>
+
+<joint name="Revolute_24" type="revolute">
+  <origin xyz="0.256739 0.288964 0.462418" rpy="0 0 0"/>
+  <parent link="shoulder_socket_bare_1_v1Mirror2"/>
+  <child link="shoulder_bare_1_v1Mirror2"/>
+  <axis xyz="1.0 0.0 -0.0"/>
+  <limit upper="1.570796" lower="-1.047198" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_24_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_24">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_24_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_25" type="revolute">
+  <origin xyz="-0.227664 0.026286 -0.351753" rpy="0 0 0"/>
+  <parent link="shoulder_bare_1_v1Mirror_11"/>
+  <child link="Hip_bare_1_v1Mirror1"/>
+  <axis xyz="0.0 -0.0 1.0"/>
+  <limit upper="1.308997" lower="-1.308997" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_25_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_25">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_25_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<joint name="Revolute_26" type="revolute">
+  <origin xyz="-0.077987 -0.122242 0.0321" rpy="0 0 0"/>
+  <parent link="Hip_bare_1_v1Mirror1"/>
+  <child link="LegXIVII.base4_bare_1_v1Mirror_11"/>
+  <axis xyz="-0.0 -0.0 1.0"/>
+  <limit upper="0.349066" lower="-2.268928" effort="100" velocity="100"/>
+</joint>
+<transmission name="Revolute_26_tran">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="Revolute_26">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="Revolute_26_actr">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+</robot>

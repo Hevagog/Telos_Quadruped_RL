@@ -1,0 +1,10 @@
+venv/
+old/
+__pycache__/
+*.pyc
+agent_visualizer.ipynb
+tensorboard/
+tst.py
+*.zip
+*.pkl
+*.Identifier
