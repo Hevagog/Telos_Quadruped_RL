@@ -8,3 +8,4 @@ tst.py
 *.zip
 *.pkl
 *.Identifier
+.*

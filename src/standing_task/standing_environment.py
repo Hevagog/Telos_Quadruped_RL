@@ -71,7 +71,9 @@ class StandingTelosTaskEnv(gym.Env):
         self.agent.set_action(action)
         self.sim.step_simulation()
         obs = self._get_obs()
-        reward = self.task.compute_reward(obs["agent"][0:3], action)
+        reward_obs = obs["agent"][7:31]
+        reward_obs = np.concatenate((obs["agent"][0:3], reward_obs[::2]))
+        reward = self.task.compute_reward(reward_obs, self.task.goal)
         done = self.task.is_terminated()
         info = self._get_info()
 

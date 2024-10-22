@@ -238,3 +238,45 @@ class PyBullet:
             baseCollisionShapeIndex=-1,  # No collision shape
             basePosition=sphere_position,
         )
+
+    def get_matrix_from_quaternion(self, quaternion) -> np.ndarray:
+        """
+        Gets the rotation matrix from a quaternion.
+        :param quaternion: Quaternion.
+        :return: Rotation matrix.
+        """
+        return p.getMatrixFromQuaternion(quaternion)
+
+    def ray_test(self, ray_from, ray_to) -> Optional[List[float]]:
+        """
+        Ray test.
+        :param ray_from: Ray from.
+        :param ray_to: Ray to.
+        :return: Boolean info and hit position.
+        """
+        return p.rayTest(ray_from, ray_to)
+
+    def add_debug_line(
+        self,
+        ray_from,
+        ray_to,
+        lineColorRGB=[1, 0, 0],
+        lineWidth=1,
+        lifeTime=0.1,
+    ) -> None:
+        """
+        Adds a debug line.
+        :param ray_from: Ray from.
+        :param ray_to: Ray to.
+        :param lineColorRGB: Line color.
+        :param lineWidth: Line width.
+        :param lifeTime: Lifetime.
+        """
+        p.addUserDebugLine(
+            ray_from,
+            ray_to,
+            lineColorRGB=lineColorRGB,
+            lineWidth=lineWidth,
+            lifeTime=lifeTime,
+        )
+

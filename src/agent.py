@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from typing import List, Tuple
 
 import pybullet as p
 from utils.telos_joints import (
@@ -31,6 +32,20 @@ class TelosAgent:
         )
 
         self.reset_angles()
+
+        #For now static values to test
+        self.max_ray_length = 2.0  # m
+        self.ray_angle_rad_x = np.radians(15)  # rad
+        self.ray_angle_rad_z = np.radians(5)
+        self.base_pos, self.base_orient = self.sim.get_all_info_from_agent(
+            self.robot_agent
+        )
+        self.ray_origins = [
+            [0.2, 0.0, 0.05],  # front right
+            [0.2, 0.0, -0.05],  # front left
+            [-0.2, 0.0, 0.05],  # rear right
+            [-0.2, 0.0, -0.05],  # rear left
+        ]
 
     def reset_angles(self):
         default_angles = self.default_angles.copy()
@@ -66,9 +81,82 @@ class TelosAgent:
         for joint in MOVING_JOINTS:
             joint_state = self.sim.get_joint_state(self.robot_agent, joint)
             observation.extend(joint_state[:2])  # Joint angle and velocity
-
         base_velocity = self.sim.get_body_velocity(self.robot_agent, type=0)
         for vel in base_velocity:
             observation.append(vel)
+        
+        # Add ray distances
+        observation.extend(self.get_ray_distances())
 
         return np.array(observation, dtype=np.float32)
+
+    def get_ray_endpoints(self) -> List[Tuple[List[float], List[float]]]:
+        """Calculate ray start and end points in world coordinates."""
+        base_pos, base_orient = self.sim.get_all_info_from_agent(self.robot_agent)
+        rot_matrix = self.sim.get_matrix_from_quaternion(base_orient)
+        rot_matrix = np.array(rot_matrix).reshape(3, 3)
+
+        rays = []
+        for origin in self.ray_origins:
+            # Transform ray origin from local to world coordinates
+            world_origin = np.array(base_pos) + rot_matrix.dot(origin)
+
+            sign_x = 1 if origin[0] > 0 else -1
+            sign_z = 1 if origin[2] > 0 else -1
+            local_dir = np.array(
+                [
+                    sign_x * np.sin(self.ray_angle_rad_x),  # x component (forward tilt)
+                    -np.cos(self.ray_angle_rad_x),  # y component (downward)
+                    sign_z * np.sin(self.ray_angle_rad_z),  # z component (right tilt)
+                ]
+            )
+            world_dir = rot_matrix.dot(local_dir)
+
+            # Calculate ray end point
+            ray_end = world_origin + world_dir * self.max_ray_length
+
+            rays.append((world_origin.tolist(), ray_end.tolist()))
+
+        return rays
+
+    def get_ray_distances(self) -> List[float]:
+        """
+        Get distances from ray intersections.
+
+        Returns:
+            List of distances for each ray. Returns max_ray_length if no intersection.
+        """
+        rays = self.get_ray_endpoints()
+        distances = []
+
+        for ray_from, ray_to in rays:
+            # Perform raytest
+            result = self.sim.ray_test(ray_from, ray_to)[0]
+            hit_fraction = result[2]
+
+            # Calculate distance
+            if hit_fraction < 1.0:  # If ray hits something
+                distance = hit_fraction * self.max_ray_length
+            else:
+                distance = self.max_ray_length
+
+            distances.append(distance)
+
+        return distances
+
+    def visualize_rays(self):
+        """Visualize rays for debugging purposes."""
+        rays = self.get_ray_endpoints()
+        debug_lines = []
+
+        for ray_from, ray_to in rays:
+            line_id = p.addUserDebugLine(
+                ray_from,
+                ray_to,
+                lineColorRGB=[1, 0, 0],  # Red color
+                lineWidth=1,
+                lifeTime=5,  # Short lifetime for dynamic updating
+            )
+            debug_lines.append(line_id)
+
+        return debug_lines

@@ -2,8 +2,11 @@ import math
 import time
 import numpy as np
 
-from utils.helper import load_yaml
-
+from utils.helper import load_yaml, soft_normalization
+from utils.telos_joints import low_angles, high_angles
+from RMP.RMPControllers.RMP_standing import rmp_standing
+from RMP.RMPControllers.RMP_constraint import RMP_joint_limits
+from RMP.RMP import combine_rmp
 
 class StandingTelosTask:
     def __init__(self, agent, sim_engine):
@@ -39,6 +42,9 @@ class StandingTelosTask:
         self.goal = np.array(
             [*_config["standing_task"]["desired_position"]], dtype=np.float32
         )
+        self.alpha = _config["rmps"]["alpha"]
+        self.beta = _config["rmps"]["beta"]
+        self.force_vector_emphasis = _config["rmps"]["force_vector_empahsis"]
         self.start_time = time.time()
 
     def reset(self, seed=None):
@@ -70,10 +76,9 @@ class StandingTelosTask:
         info={},
     ) -> float:
 
-        smoothing_reward = -self.smoothing_factor * np.sum(
-            self.sim.get_velocity_from_rotary(self.agent.robot_agent)
-        )
-
+        # smoothing_reward = -self.smoothing_factor * np.sum(
+        #     self.sim.get_velocity_from_rotary(self.agent.robot_agent)
+        # )
         pitch_reward = -self.angle_dip_bias * math.pow(
             self.sim.get_pitch_angle(self.agent.robot_agent) - self.start_pitch, 2
         )
@@ -83,16 +88,28 @@ class StandingTelosTask:
         yaw_reward = -self.angle_dip_bias * math.pow(
             self.sim.get_yaw_angle(self.agent.robot_agent) - self.start_yaw, 2
         )
-
+        
         time_reward = self.time_emphasis * self.get_episode_time()
+
+        standing_f, _ = rmp_standing(q= achieved_goal[0:3], q_dot= self.agent.get_joints_velocities(), xg= self.goal, center_of_mass= self.sim.get_center_of_mass(self.agent.robot_agent))
+        standing_f = - np.dot(self.force_vector_emphasis, standing_f[:3])
+
+        joint_limits_f, _ = RMP_joint_limits(q= achieved_goal[3:] ,dq = self.agent.get_joints_velocities(), alpha= self.alpha, beta= self.beta, low_angles= low_angles, high_angles= high_angles)
+        joint_limits_f =  - np.linalg.norm(joint_limits_f)
+
+
+        rmp_reward = standing_f + joint_limits_f
+
+        # distance_reward = self.alpha * np.linalg.norm(soft_normalization(np.array(achieved_goal[:3]) - self.goal)) - self.beta *  np.linalg.norm(np.array(self.sim.get_body_velocity(self.agent.robot_agent,0)))
+        
         distance_reward = (
             self.good_position_reward
-            if np.linalg.norm(achieved_goal - self.goal) < self.dist_threshold
-            else -np.linalg.norm(achieved_goal - self.goal) * self.bad_position_penalty
+            if np.linalg.norm(achieved_goal[:3] - self.goal) < self.dist_threshold
+            else 0
         )
 
         return (
-            smoothing_reward
+            rmp_reward
             + pitch_reward
             + time_reward
             + distance_reward
