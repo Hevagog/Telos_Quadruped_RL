@@ -49,6 +49,15 @@ class PyBullet:
         """
         return p.getBaseVelocity(agent)[type]
 
+    def get_orientation(self, agent) -> np.ndarray:
+        """
+        Gets the orientation of the agent.
+        :return: Orientation of the agent.
+        """
+        return np.array(
+            p.getEulerFromQuaternion(p.getBasePositionAndOrientation(agent)[1])[:3]
+        )
+
     def get_pitch_angle(self, agent) -> float:
         """
         Gets the pitch angle of the agent.
@@ -280,3 +289,25 @@ class PyBullet:
             lifeTime=lifeTime,
         )
 
+    def get_num_joints(self, agent) -> int:
+        """
+        Gets the number of joints in the agent.
+        :return: Number of joints in the agent.
+        """
+        return p.getNumJoints(agent)
+
+    def get_link_state(self, agent, link_id) -> Tuple[List[float], List[float]]:
+        """
+        Gets the link state.
+        :param link_id: ID of the link.
+        :return: Link state.
+        """
+        return p.getLinkState(agent, link_id)
+
+    def get_aabb(self, agent, link_id) -> Tuple[List[float], List[float]]:
+        """
+        Gets the axis-aligned bounding box (AABB).
+        :param link_id: ID of the link.
+        :return: AABB.
+        """
+        return p.getAABB(agent, link_id)

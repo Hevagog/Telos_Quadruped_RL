@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def combine_rmp(f1, A1, f2, A2):
     """
     Combine two RMPs using the metric-weighted average formula.
@@ -15,11 +16,12 @@ def combine_rmp(f1, A1, f2, A2):
     A_combined -- combined metric matrix
     """
     A_combined = A1 + A2
-    
+
     # Compute the sum of metric-weighted forces
     f_combined = np.linalg.pinv(A_combined) @ (A1 @ f1 + A2 @ f2)
-    
+
     return f_combined, A_combined
+
 
 def combine_rmps(rmps):
     """
@@ -45,5 +47,5 @@ def combine_rmps(rmps):
 
     # Compute the combined force vector using the pseudoinverse
     f_combined = np.linalg.pinv(A_sum) @ f_weighted_sum
-    
+
     return f_combined, A_sum

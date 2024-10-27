@@ -22,8 +22,9 @@ class TelosAgent:
         _urdf_root_path = _current_dir + _config["pybullet"]["robot"]["urdf_path"]
 
         self.default_angles = DEFAULT_ANGLES
+        self.start_orientation = _config["pybullet"]["robot"]["start_orientation"]
         self.cube_start_orientation = self.sim.get_quaternion_from_euler(
-            [*_config["pybullet"]["robot"]["start_orientation"]]
+            [*self.start_orientation]
         )
 
         self.start_pos = [*_config["pybullet"]["robot"]["start_position"]]
@@ -33,13 +34,14 @@ class TelosAgent:
 
         self.reset_angles()
 
-        #For now static values to test
+        ## leg sensing also static for now
+        self._leg_tip_indices = [3, 7, 11, 15]
+
+        ## For now static values to test
         self.max_ray_length = 2.0  # m
         self.ray_angle_rad_x = np.radians(15)  # rad
         self.ray_angle_rad_z = np.radians(5)
-        self.base_pos, self.base_orient = self.sim.get_all_info_from_agent(
-            self.robot_agent
-        )
+
         self.ray_origins = [
             [0.2, 0.0, 0.05],  # front right
             [0.2, 0.0, -0.05],  # front left
@@ -84,15 +86,22 @@ class TelosAgent:
         base_velocity = self.sim.get_body_velocity(self.robot_agent, type=0)
         for vel in base_velocity:
             observation.append(vel)
-        
         # Add ray distances
-        observation.extend(self.get_ray_distances())
+        observation.extend(self.get_ray_distances(position, orientation))
+
+        end_effector_pos = []
+        # Get leg tip positions
+        for leg_tip in self._leg_tip_indices:
+            min_tip_pos = self.sim.get_aabb(self.robot_agent, leg_tip)[0]
+            end_effector_pos.extend(min_tip_pos)
+        observation.extend(end_effector_pos)
 
         return np.array(observation, dtype=np.float32)
 
-    def get_ray_endpoints(self) -> List[Tuple[List[float], List[float]]]:
+    def get_ray_endpoints(
+        self, base_pos, base_orient
+    ) -> List[Tuple[List[float], List[float]]]:
         """Calculate ray start and end points in world coordinates."""
-        base_pos, base_orient = self.sim.get_all_info_from_agent(self.robot_agent)
         rot_matrix = self.sim.get_matrix_from_quaternion(base_orient)
         rot_matrix = np.array(rot_matrix).reshape(3, 3)
 
@@ -119,14 +128,14 @@ class TelosAgent:
 
         return rays
 
-    def get_ray_distances(self) -> List[float]:
+    def get_ray_distances(self, position, orientation) -> List[float]:
         """
         Get distances from ray intersections.
 
         Returns:
             List of distances for each ray. Returns max_ray_length if no intersection.
         """
-        rays = self.get_ray_endpoints()
+        rays = self.get_ray_endpoints(position, orientation)
         distances = []
 
         for ray_from, ray_to in rays:

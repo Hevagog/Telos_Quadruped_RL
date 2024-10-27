@@ -66,18 +66,22 @@ class StandingTelosTaskEnv(gym.Env):
         return observation, info
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, bool, dict]:
-        # old_action = self.agent.old_action
 
         self.agent.set_action(action)
         self.sim.step_simulation()
         obs = self._get_obs()
+
         reward_obs = obs["agent"][7:31]
-        reward_obs = np.concatenate((obs["agent"][0:3], reward_obs[::2]))
-        reward = self.task.compute_reward(reward_obs, self.task.goal)
-        done = self.task.is_terminated()
+        end_effector_pos = obs["agent"][-12:]
+        end_effector_zs = end_effector_pos[2::3]
+
+        reward_obs = np.concatenate(
+            (obs["agent"][0:3], reward_obs[::2], end_effector_zs)
+        )
+        done = self.task.is_terminated(obs["agent"][0:3])
+        reward = self.task.compute_reward(reward_obs, is_terminated=done)
         info = self._get_info()
 
-        # self.agent.old_action = action
         return obs, reward, done, False, info
 
     def close(self):
