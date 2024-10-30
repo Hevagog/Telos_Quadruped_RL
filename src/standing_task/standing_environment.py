@@ -1,19 +1,19 @@
 import math
 import numpy as np
 import gymnasium as gym
-from typing import Tuple
+from typing import Tuple, Optional
 
-from typing import Optional
-import utils.telos_joints as tj
-from utils.helper import load_yaml
-from utils.PyBullet import PyBullet
+
+import src.utils.telos_joints as tj
+from src.utils.helper import load_yaml
+from src.utils.PyBullet import PyBullet
 
 
 class StandingTelosTaskEnv(gym.Env):
     def __init__(
         self, task, agent, sim_engine: PyBullet, rotating_plane: bool = False
     ) -> None:
-        _config = load_yaml("pybullet_config.yaml")
+        _config = load_yaml("src/pybullet_config.yaml")
         self.task = task
         self.agent = agent
         self.sim = sim_engine
@@ -79,7 +79,7 @@ class StandingTelosTaskEnv(gym.Env):
             (obs["agent"][0:3], reward_obs[::2], end_effector_zs)
         )
         done = self.task.is_terminated(obs["agent"][0:3])
-        reward = self.task.compute_reward(reward_obs, is_terminated=done)
+        reward = self.task.compute_reward(reward_obs)
         info = self._get_info()
 
         return obs, reward, done, False, info
@@ -94,9 +94,6 @@ class StandingTelosTaskEnv(gym.Env):
                 self.agent.robot_agent, self.plane, zero_z=False
             )
             if contact and contact_points.shape[0] >= 4:
-                for contact_point in contact_points:
-                    self.sim.draw_debug_sphere(contact_point)
-
                 break
             self.sim.step_simulation()
 

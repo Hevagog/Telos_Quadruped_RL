@@ -6,7 +6,7 @@ from utils.helper import load_yaml
 
 class TelosTask:
     def __init__(self, agent, sim_engine):
-        _config = load_yaml("pybullet_config.yaml")
+        _config = load_yaml("src/pybullet_config.yaml")
         self.agent = agent
         self.sim = sim_engine
         self.pitch_bias = _config["task"]["pitch_bias"]

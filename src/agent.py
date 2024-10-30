@@ -3,12 +3,12 @@ import numpy as np
 from typing import List, Tuple
 
 import pybullet as p
-from utils.telos_joints import (
+from src.utils.telos_joints import (
     DEFAULT_ANGLES,
     MOVING_JOINTS,
 )
-from utils.helper import load_yaml
-from utils.PyBullet import PyBullet
+from src.utils.helper import load_yaml
+from src.utils.PyBullet import PyBullet
 
 
 class TelosAgent:
@@ -17,7 +17,7 @@ class TelosAgent:
         sim_engine: PyBullet,
     ) -> None:
         self.sim = sim_engine
-        _config = load_yaml("pybullet_config.yaml")
+        _config = load_yaml("src/pybullet_config.yaml")
         _current_dir = os.path.dirname(os.path.realpath(__file__))
         _urdf_root_path = _current_dir + _config["pybullet"]["robot"]["urdf_path"]
 
@@ -86,6 +86,7 @@ class TelosAgent:
         base_velocity = self.sim.get_body_velocity(self.robot_agent, type=0)
         for vel in base_velocity:
             observation.append(vel)
+
         # Add ray distances
         observation.extend(self.get_ray_distances(position, orientation))
 

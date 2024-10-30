@@ -3,10 +3,10 @@ pybullet:
     gravity: [0, 0, -9.81]
     time_step: 0.016666666666666666
     num_solver_iterations: 5
-    num_substeps: 4
+    num_substeps: 1
   robot:
     urdf_path: "/urdf/tt.urdf"
-    start_position: [0, 0, 0.295]
+    start_position: [0, 0, 0.175]
     start_orientation: [1.5707963267948966, 0, -3.1415926535897932]
     power: 16 #Watt 
     max_robot_angular_velocity: 1 #rad/s
@@ -14,23 +14,24 @@ task:
   goal_radius: 5
   goal_angle_bounds: [-45, 45]
   smoothing_factor: 0.9
-  distance_threshold: 0.1
-  fall_threshold: 0.23
+  distance_threshold: 0.05
+  fall_threshold: 0.13
   fall_reward: -25.0
   forward_velocity_bias: 0.8
   pitch_bias: 20
   max_angle_dip: 0.785398 # RADIANS!
 standing_task:
-  angle_dip_bias: .75
+  angle_dip_bias: .5
   smoothing_factor: .40
   action_smoothing_factor: 10
-  up_threshold: 0.5
+  jump_penalty: 0.75
+  up_threshold: 0.4
   time_emphasis: 0.2
   time_threshold: 2000.0
   plane_angle_bounds: 15 # +/- 5 degrees
   max_angle_dip: 0.523599 # RADIANS!
   max_angle_dev: 5
-  desired_position: [0, 0, 0.25]
+  desired_position: [0, 0, 0.28]
   good_position_reward: 5.0
   bad_position_penalty: .8
   distance_threshold: 0.05
