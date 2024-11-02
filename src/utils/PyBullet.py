@@ -17,7 +17,7 @@ class PyBullet:
         render_mode: str = "rgb_array",
         renderer: str = "Tiny",
     ) -> None:
-        _config = load_yaml("pybullet_config.yaml")
+        _config = load_yaml("src/pybullet_config.yaml")
         self.n_substeps = _config["pybullet"]["simulation"]["num_substeps"]
         self.render_mode = render_mode
         self.renderer = renderer
@@ -146,6 +146,16 @@ class PyBullet:
             controlMode=control_mode,
             targetPositions=target_positions,
             targetVelocities=target_velocities,
+        )
+
+    def reset_joints_force(
+        self, agent, joint_ids, control_mode=p.POSITION_CONTROL
+    ) -> None:
+        p.setJointMotorControlArray(
+            agent,
+            joint_ids,
+            controlMode=control_mode,
+            forces=np.zeros(len(joint_ids)),
         )
 
     def step_simulation(self) -> None:

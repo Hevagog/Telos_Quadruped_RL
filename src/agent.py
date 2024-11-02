@@ -63,6 +63,7 @@ class TelosAgent:
             self.robot_agent, self.start_pos, self.cube_start_orientation
         )
         self.reset_angles()
+        self.sim.reset_joints_force(self.robot_agent, range(16))
 
     def get_joints_velocities(self):
         return np.array(self.sim.get_velocity_from_rotary(self.robot_agent))
