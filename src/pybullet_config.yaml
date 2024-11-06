@@ -2,35 +2,44 @@ pybullet:
   simulation:
     gravity: [0, 0, -9.81]
     time_step: 0.016666666666666666
-    num_solver_iterations: 5
+    num_solver_iterations: 50
     num_substeps: 1
   robot:
+    # TERMINATORS:
+    max_robot_angular_velocity: 10 #rad/s
+
     urdf_path: "/urdf/tt.urdf"
     start_position: [0, 0, 0.173]
     start_orientation: [1.5707963267948966, 0, -3.1415926535897932]
-    power: 16 #Watt 
-    max_robot_angular_velocity: 10 #rad/s
+    # Motor parameters
+    power: 2 #Watt 
+    max_velocity: 0.5235987755982988 #rad/s
+    transmission_ratio: 1.5
 task:
+  # TERMINATORS:
+  fall_threshold: 0.13
+
   goal_radius: 5
   goal_angle_bounds: [-45, 45]
   smoothing_factor: 0.9
   distance_threshold: 0.1
-  fall_threshold: 0.13
   fall_reward: -25.0
   forward_velocity_bias: 0.8
   pitch_bias: 20
   max_angle_dip: 0.785398 # RADIANS!
 standing_task:
+  # TERMINATORS:
+  max_angle_dip: 0.523599 # RADIANS!
+  up_threshold: 0.4
+  time_threshold: 2000.0
+
   angular_velocity_penalty: 0.5
   angle_dip_bias: .25
   smoothing_factor: .40
   action_smoothing_factor: 10
   jump_penalty: 0.5
-  up_threshold: 0.4
   time_emphasis: 0.2
-  time_threshold: 20.0
   plane_angle_bounds: 15 # +/- 5 degrees
-  max_angle_dip: 0.523599 # RADIANS!
   max_angle_dev: 5
   desired_position: [0, 0, 0.28]
   good_position_reward: 1.5

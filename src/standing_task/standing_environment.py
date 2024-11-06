@@ -53,7 +53,10 @@ class StandingTelosTaskEnv(gym.Env):
     def _get_info(self):
         agent_pos = self._get_obs()["agent"][0:3]
         goal_pos = self.task.goal
-        return {"agent_position": agent_pos, "goal_position": goal_pos}
+        return {
+            "agent_position": agent_pos,
+            "goal_position": goal_pos,
+        }
 
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
         super().reset(seed=seed, options=options)
@@ -70,7 +73,6 @@ class StandingTelosTaskEnv(gym.Env):
         self.agent.set_action(action)
         self.sim.step_simulation()
         obs = self._get_obs()
-
         reward_obs = obs["agent"][7:31]
         end_effector_pos = obs["agent"][-12:]
         end_effector_zs = end_effector_pos[2::3]
@@ -78,11 +80,10 @@ class StandingTelosTaskEnv(gym.Env):
         reward_obs = np.concatenate(
             (obs["agent"][0:3], reward_obs[::2], end_effector_zs)
         )
-        done = self.task.is_terminated(obs["agent"][0:3])
+        terminated = self.task.is_terminated(obs["agent"][0:3])
         reward = self.task.compute_reward(reward_obs)
         info = self._get_info()
-
-        return obs, reward, done, False, info
+        return obs, reward, terminated, False, info
 
     def close(self):
         self.sim.close()

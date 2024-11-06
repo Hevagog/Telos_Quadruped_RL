@@ -19,6 +19,13 @@ class PyBullet:
     ) -> None:
         _config = load_yaml("src/pybullet_config.yaml")
         self.n_substeps = _config["pybullet"]["simulation"]["num_substeps"]
+
+        self.motor_power = _config["pybullet"]["robot"]["power"]
+        self.max_velocity = _config["pybullet"]["robot"]["max_velocity"]
+        self.transmission_ratio = _config["pybullet"]["robot"]["transmission_ratio"]
+
+        self.max_motor_power = self.motor_power
+
         self.render_mode = render_mode
         self.renderer = renderer
 
@@ -33,13 +40,6 @@ class PyBullet:
         self.physics_client = p.connect(self.connection_mode)
         p.setGravity(*_config["pybullet"]["simulation"]["gravity"])
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
-        p.setPhysicsEngineParameter(
-            fixedTimeStep=_config["pybullet"]["simulation"]["time_step"],
-            numSolverIterations=_config["pybullet"]["simulation"][
-                "num_solver_iterations"
-            ],
-            numSubSteps=_config["pybullet"]["simulation"]["num_substeps"],
-        )
 
     def get_body_velocity(self, agent, type: int) -> List[float]:
         """
@@ -146,6 +146,40 @@ class PyBullet:
             controlMode=control_mode,
             targetPositions=target_positions,
             targetVelocities=target_velocities,
+        )
+
+    def control_joints_with_Kp(
+        self,
+        agent,
+        joint_ids,
+        target_positions,
+        control_mode=p.POSITION_CONTROL,
+        Kp=2.0,
+    ) -> None:
+        """
+        Controls the joints of the agent with target velocities based on proportional control.
+        :param joint_ids: IDs of the joints.
+        :param target_positions: Target positions.
+        :param control_mode: Control mode.
+        :param Kp: Proportional gain for velocity control.
+        :param max_velocity: Maximum allowable velocity for stability.
+        """
+
+        current_positions = [self.get_joint_state(agent, jid)[0] for jid in joint_ids]
+
+        target_velocities = np.clip(
+            Kp * (np.array(target_positions) - np.array(current_positions)),
+            -self.max_velocity,
+            self.max_velocity,
+        ).tolist()
+
+        p.setJointMotorControlArray(
+            agent,
+            joint_ids,
+            controlMode=control_mode,
+            targetPositions=target_positions,
+            targetVelocities=target_velocities,
+            forces=[self.max_motor_power] * len(joint_ids),
         )
 
     def reset_joints_force(

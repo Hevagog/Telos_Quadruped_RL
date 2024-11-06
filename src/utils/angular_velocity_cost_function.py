@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def angular_velocity_cost(joint_velocities: np.ndarray, min_angular_velocity=0.5):
+def angular_velocity_cost(joint_velocities: np.ndarray, min_angular_velocity=0.05):
     """
     Calculate the cost of the angular velocity of the robot.
 

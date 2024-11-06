@@ -69,7 +69,7 @@ class TelosAgent:
         return np.array(self.sim.get_velocity_from_rotary(self.robot_agent))
 
     def set_action(self, action):
-        self.sim.control_joints(self.robot_agent, MOVING_JOINTS, action, np.zeros(12))
+        self.sim.control_joints_with_Kp(self.robot_agent, MOVING_JOINTS, action)
 
     def get_obs(self):
         """
