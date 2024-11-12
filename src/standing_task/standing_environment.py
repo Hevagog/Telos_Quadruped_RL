@@ -48,7 +48,7 @@ class StandingTelosTaskEnv(gym.Env):
         self.sim.reset_base_pos(self.plane, [0, 0, 0], orientation)
 
     def _get_obs(self):
-        return {"agent": self.agent.get_obs()}
+        return {"agent": self.agent.get_obs(self.plane)}
 
     def _get_info(self):
         agent_pos = self._get_obs()["agent"][0:3]

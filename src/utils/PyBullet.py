@@ -355,3 +355,14 @@ class PyBullet:
         :return: AABB.
         """
         return p.getAABB(agent, link_id)
+
+    def get_closest_point_to_plane(
+        self, agent, plane_id, agent_link, distance=0.2
+    ) -> List[float]:
+        """
+        Gets the closest point to the plane.
+        :param plane_id: ID of the plane.
+        :param agent_link: Link of the agent joint.
+        :return: Closest point to the plane.
+        """
+        return p.getClosestPoints(agent, plane_id, distance, linkIndexA=agent_link)

@@ -22,6 +22,7 @@ class TelosAgent:
         _urdf_root_path = _current_dir + _config["pybullet"]["robot"]["urdf_path"]
 
         self.default_angles = DEFAULT_ANGLES
+        self.liftoff_height = _config["pybullet"]["robot"]["liftoff_height"]
         self.start_orientation = _config["pybullet"]["robot"]["start_orientation"]
         self.cube_start_orientation = self.sim.get_quaternion_from_euler(
             [*self.start_orientation]
@@ -71,9 +72,10 @@ class TelosAgent:
     def set_action(self, action):
         self.sim.control_joints_with_Kp(self.robot_agent, MOVING_JOINTS, action)
 
-    def get_obs(self):
+    def get_obs(self, plane_id=None):
         """
         Gets the observation for the quadruped robot.
+        :param plane_id: The plane id of the environment.
         :return: Observation for the quadruped robot as a list of shape (34,).
         """
         observation = []
@@ -90,13 +92,18 @@ class TelosAgent:
 
         # Add ray distances
         observation.extend(self.get_ray_distances(position, orientation))
-
-        end_effector_pos = []
-        # Get leg tip positions
-        for leg_tip in self._leg_tip_indices:
-            min_tip_pos = self.sim.get_aabb(self.robot_agent, leg_tip)[0]
-            end_effector_pos.extend(min_tip_pos)
-        observation.extend(end_effector_pos)
+        if plane_id is not None:
+            end_effector_pos = []
+            # Get leg tip positions (this time correctly :))
+            for knee_joint_id in self._leg_tip_indices:
+                points = self.sim.get_closest_point_to_plane(
+                    self.robot_agent, plane_id, knee_joint_id, self.liftoff_height
+                )
+                if points:
+                    end_effector_pos.extend(points[0][5])
+                else:
+                    end_effector_pos.extend(-1 * np.ones(3))
+            observation.extend(end_effector_pos)
 
         return np.array(observation, dtype=np.float32)
 

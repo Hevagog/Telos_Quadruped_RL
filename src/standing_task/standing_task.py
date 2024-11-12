@@ -104,38 +104,46 @@ class StandingTelosTask:
         info={},
     ) -> float:
 
-        position_reward = np.abs(achieved_goal[:3] - self.goal)
-        position_reward = np.sum(position_reward)
+        position_penalty = np.abs(achieved_goal[:3] - self.goal)
+        position_penalty = np.sum(position_penalty)
 
         if (np.abs(achieved_goal[:3] - self.goal) < self.dist_threshold).all():
-            position_reward = self.good_position_reward - position_reward
+            position_reward = self.good_position_reward - position_penalty
         else:
-            position_reward = -1 * ((position_reward * 10) ** 2)
+            position_reward = -1 * ((position_penalty * 10) ** 2)
             # position_reward = (
             #     self.get_in_goal_pos_time()
-            #     * (self.good_position_reward - position_reward)
+            #     * (self.good_position_reward - position_penalty)
             #     if self.get_in_goal_pos_time() > 1
-            #     else self.good_position_reward - position_reward
+            #     else self.good_position_reward - position_penalty
             # )
 
-        # jumping_cost = max(
-        #     0, min(1, abs(self.sim.get_body_velocity(self.agent.robot_agent, 0)[2]))
-        # )
-        # orientation_cost_reward = unbounded_orientation_cost(
-        #     current_orientation=self.sim.get_orientation(self.agent.robot_agent)[:2],
-        #     desired_orientation=np.array([self.start_pitch, self.start_roll]),
-        # )
+        if achieved_goal[2] > self.goal[2]:
+            jumping_cost = (
+                2 * self.sim.get_body_velocity(self.agent.robot_agent, 0)[2]
+            ) ** 2
+        else:
+            jumping_cost = max(
+                0, min(1, abs(self.sim.get_body_velocity(self.agent.robot_agent, 0)[2]))
+            )
+        orientation_cost_reward = orientation_cost(
+            current_orientation=self.sim.get_orientation(self.agent.robot_agent)[:2],
+            desired_orientation=np.array([self.start_pitch, self.start_roll]),
+        )
 
-        # angular_velocity_cost_reward = angular_velocity_cost(
-        #     joint_velocities=self.agent.get_joints_velocities()
-        # )
-        # reward = (
-        #     position_reward
-        #     + self.angular_velocity_penalty * angular_velocity_cost_reward
-        #     - self.jump_penalty * jumping_cost
-        #     + self.angle_dip_bias * orientation_cost_reward
-        # )
-        return position_reward
+        jumping_component = -self.jump_penalty * jumping_cost
+        orientation_component = self.angle_dip_bias * orientation_cost_reward
+
+        liftoff_penalty = np.sum((achieved_goal[-4:] == -1) * -10)
+
+        # Sum all components to get the final reward
+        reward = (
+            position_reward
+            + jumping_component
+            + orientation_component
+            + liftoff_penalty
+        )
+        return reward
 
         # standing_f, _ = rmp_standing(
         #     q=achieved_goal[0:3],

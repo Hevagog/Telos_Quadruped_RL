@@ -11,6 +11,7 @@ pybullet:
     urdf_path: "/urdf/tt.urdf"
     start_position: [0, 0, 0.173]
     start_orientation: [1.5707963267948966, 0, -3.1415926535897932]
+    liftoff_height: 0.0025
     # Motor parameters
     power: 2 #Watt 
     max_velocity: 0.5235987755982988 #rad/s
