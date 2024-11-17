@@ -89,13 +89,21 @@ class PyBullet:
         """
         return p.getJointState(agent, joint_id)
 
-    def get_joint_velocity(self, agent, joint_id) -> float:
+    def get_joint_torque(self, agent, joint_id) -> float:
         """
-        Gets the joint velocity for the specified joint.
+        Gets the joint torque for the specified joint.
         :param joint_id: ID of the joint.
-        :return: Joint velocity.
+        :return: Joint torque.
         """
         return p.getJointState(agent, joint_id)[3]
+
+    def get_moving_joints_torques(self, agent) -> List[float]:
+        """
+        Gets the torques from rotary joints.
+        :return: Torques from rotary joints.
+        """
+        torques = [self.get_joint_torque(agent, joint) for joint in MOVING_JOINTS]
+        return torques
 
     def get_velocity_from_rotary(self, agent) -> List[float]:
         """

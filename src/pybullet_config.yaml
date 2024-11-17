@@ -24,7 +24,7 @@ task:
   goal_angle_bounds: [-45, 45]
   smoothing_factor: 0.9
   distance_threshold: 0.1
-  fall_reward: -25.0
+  fall_reward: -50.0
   forward_velocity_bias: 0.8
   pitch_bias: 20
   max_angle_dip: 0.785398 # RADIANS!
@@ -47,6 +47,21 @@ standing_task:
   bad_position_penalty: .8
   distance_threshold: 0.05
   initial_angles: [-0.0, 1.5707963267948963, -3.141592653589793]
+
+walking_task:
+# TERMINATORS:
+  max_pitch_angle: 0.523599 # RADIANS!
+  max_roll_angle: 0.349066 # RADIANS!
+  max_yaw_angle: 0.785398 # RADIANS!
+  up_threshold: 0.4
+
+  forward_motion_reward: 1.0
+  optimal_z_height: 0.28
+  distance_threshold: 0.1
+  max_angle_dev: 5
+  torque_penalty: 1.5
+
+
 rmps:
   force_vector_empahsis: [0.75, 1.5, 0.75]
   alpha: 1.0
