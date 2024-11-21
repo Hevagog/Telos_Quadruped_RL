@@ -3,10 +3,7 @@ import numpy as np
 from typing import List, Tuple
 
 import pybullet as p
-from src.utils.telos_joints import (
-    DEFAULT_ANGLES,
-    MOVING_JOINTS,
-)
+from src.utils.telos_joints import DEFAULT_ANGLES, MOVING_JOINTS, DEFAULT_MOVING_ANGLES
 from src.utils.helper import load_yaml
 from src.utils.PyBullet import PyBullet
 
@@ -22,6 +19,8 @@ class TelosAgent:
         _urdf_root_path = _current_dir + _config["pybullet"]["robot"]["urdf_path"]
 
         self.default_angles = DEFAULT_ANGLES
+        self.default_moving_angles = DEFAULT_MOVING_ANGLES
+
         self.liftoff_height = _config["pybullet"]["robot"]["liftoff_height"]
         self.start_orientation = _config["pybullet"]["robot"]["start_orientation"]
         self.cube_start_orientation = self.sim.get_quaternion_from_euler(
@@ -66,11 +65,16 @@ class TelosAgent:
         self.reset_angles()
         self.sim.reset_joints_force(self.robot_agent, range(16))
 
-    def get_joints_velocities(self):
-        return np.array(self.sim.get_velocity_from_rotary(self.robot_agent))
+    def get_moving_joints_torques(self):
+        return np.array(self.sim.get_moving_joints_torques(self.robot_agent))
 
     def set_action(self, action):
-        self.sim.control_joints_with_Kp(self.robot_agent, MOVING_JOINTS, action)
+        self.sim.control_joints_with_Kp(
+            self.robot_agent,
+            MOVING_JOINTS,
+            self.default_moving_angles
+            + action,  # ACTION IS DEVITAION FROM DEFAULT ANGLE
+        )
 
     def get_obs(self, plane_id=None):
         """
