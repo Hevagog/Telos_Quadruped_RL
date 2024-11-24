@@ -26,6 +26,7 @@ class WalkingTelosTask:
         self.max_yaw_angle = _config["walking_task"]["max_yaw_angle"]
         self.forward_motion_reward = _config["walking_task"]["forward_motion_reward"]
         self.torque_penalty = _config["walking_task"]["torque_penalty"]
+        self.x_position_reward = _config["walking_task"]["x_position_reward"]
         self.max_robot_torque = _config["pybullet"]["robot"]["max_robot_torque"]
         self.x_backward_threshold = _config["walking_task"]["x_backward_threshold"]
 
@@ -50,18 +51,18 @@ class WalkingTelosTask:
         roll_angle = abs(
             self.sim.get_roll_angle(self.agent.robot_agent) - self.start_roll
         )
-        pitch_angle = abs(
-            self.sim.get_pitch_angle(self.agent.robot_agent) - self.start_pitch
-        )
-        # yaw_angle = abs(
-        #     abs(self.sim.get_yaw_angle(self.agent.robot_agent)) - self.start_yaw
+        # pitch_angle = abs(
+        #     self.sim.get_pitch_angle(self.agent.robot_agent) - self.start_pitch
         # )
+        yaw_angle = abs(
+            abs(self.sim.get_yaw_angle(self.agent.robot_agent)) - abs(self.start_yaw)
+        )
         is_terminated = (
             # Tipping over
-            pitch_angle > self.max_pitch_angle
-            or self.max_roll_angle < roll_angle
+            # pitch_angle > self.max_pitch_angle or
+            self.max_roll_angle < roll_angle
             or self.x_backward_threshold > agent_pos[0]
-            # or self.max_yaw_angle < yaw_angle
+            or self.max_yaw_angle < yaw_angle
             # Falling or Jumping
             or self.agent.get_obs()[2] < self.fall_threshold
             or self.up_threshold < self.agent.get_obs()[2]
@@ -84,6 +85,9 @@ class WalkingTelosTask:
             self.forward_motion_reward * forward_velocity if forward_velocity > 0 else 0
         )
 
+        # Reward the x position
+        x_position_reward = achieved_goal[0] * self.x_position_reward
+
         # Penalization of too high torque on the joints
         torques = self.sim.get_moving_joints_torques(self.agent.robot_agent)
         torque_penalty = (
@@ -99,14 +103,29 @@ class WalkingTelosTask:
             desired_orientation=np.array([self.start_pitch, self.start_roll]),
             lower_threshold_deg=15,
         )
-        # Penalize move upward
-        # upward_velocity = -0.1 * abs(agent_velocity[2])
+        # Penalize jumping and keeping more than 2 legs off the ground
+        if np.sum(achieved_goal[-4:] < 0) > 2:
+            liftoff_penalty = -0.2 * np.sum((achieved_goal[-4:] == -1))
+            forward_reward = forward_reward * (1 - 0.2 * np.sum(achieved_goal[-4:] < 0))
+        else:
+            liftoff_penalty = 0
+
+        z_penalty = -0.1 * agent_velocity[2] ** 2
+
         # Penalize jumping and falling
         if info.get("is_terminated"):
             fall_reward = self.fall_reward
         else:
             fall_reward = 0
 
-        reward = forward_reward + torque_penalty + orientation + fall_reward
+        reward = (
+            forward_reward
+            + torque_penalty
+            + orientation
+            + fall_reward
+            + liftoff_penalty
+            + x_position_reward
+            + z_penalty
+        )
 
         return reward

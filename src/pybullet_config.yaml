@@ -27,14 +27,14 @@ task:
   goal_angle_bounds: [-45, 45]
   smoothing_factor: 0.9
   distance_threshold: 0.1
-  fall_reward: -50.0
+  fall_reward: -10.0
   forward_velocity_bias: 0.8
   pitch_bias: 20
   max_angle_dip: 0.785398 # RADIANS!
 standing_task:
   # TERMINATORS:
   max_angle_dip: 0.523599 # RADIANS!
-  up_threshold: 0.35
+  up_threshold: 0.4
   time_threshold: 2000.0
 
   angular_velocity_penalty: 0.5
@@ -59,7 +59,8 @@ walking_task:
   up_threshold: 0.4
   x_backward_threshold: -0.1
 
-  forward_motion_reward: 10.0
+  x_position_reward: 5.0
+  forward_motion_reward: 4.0
   optimal_z_height: 0.28
   distance_threshold: 0.1
   max_angle_dev: 5
