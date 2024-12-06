@@ -40,6 +40,7 @@ def unbounded_orientation_cost(
     current_orientation: np.ndarray,
     desired_orientation: np.ndarray,
     lower_threshold_deg: float = 5.0,
+    weight_per_axis: np.ndarray = np.ones(2),
 ):
     """
     Calculate the cost of the orientation of the robot.
@@ -62,5 +63,6 @@ def unbounded_orientation_cost(
         (1 + abs_delta) ** 3,
         0,
     )
+    cost_per_axis = weight_per_axis * cost_per_axis
 
     return -np.sum(cost_per_axis)

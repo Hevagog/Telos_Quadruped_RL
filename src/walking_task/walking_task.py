@@ -26,10 +26,11 @@ class WalkingTelosTask:
         self.max_yaw_angle = _config["walking_task"]["max_yaw_angle"]
         self.forward_motion_reward = _config["walking_task"]["forward_motion_reward"]
         self.torque_penalty = _config["walking_task"]["torque_penalty"]
+        self.optimal_z_height = _config["walking_task"]["optimal_z_height"]
         self.x_position_reward = _config["walking_task"]["x_position_reward"]
         self.max_robot_torque = _config["pybullet"]["robot"]["max_robot_torque"]
         self.x_backward_threshold = _config["walking_task"]["x_backward_threshold"]
-
+        self.x_successful_threshold = _config["walking_task"]["max_x_position"]
         self.start_pitch, self.start_roll, self.start_yaw = [
             *_config["standing_task"]["initial_angles"]
         ]
@@ -38,11 +39,20 @@ class WalkingTelosTask:
         ]
         self.start_time = time.time()
 
+        # Measure x increment for the reward
+        self.odl_x = 0
+
+        # Curriculum learning
+        self.current_difficulty = 0.005
+
     def reset(self, seed=None):
         self.start_time = time.time()
 
     def get_obs(self):
         return self.agent.get_obs()
+
+    def set_difficulty(self, difficulty: float):
+        self.current_difficulty = difficulty
 
     def get_episode_time(self) -> float:
         return time.time() - self.start_time
@@ -68,6 +78,7 @@ class WalkingTelosTask:
             or self.up_threshold < self.agent.get_obs()[2]
             # Cap on max torque
             or max(abs(self.agent.get_moving_joints_torques())) > self.max_robot_torque
+            or agent_pos[0] >= self.x_successful_threshold
         )
 
         return is_terminated
@@ -80,37 +91,51 @@ class WalkingTelosTask:
         agent_velocity = self.sim.get_body_velocity(self.agent.robot_agent, type=0)
 
         # Reward the frontal motion
-        forward_velocity = agent_velocity[0]  # x velocity
-        forward_reward = (
-            self.forward_motion_reward * forward_velocity if forward_velocity > 0 else 0
+        forward_reward = agent_velocity[0] if agent_velocity[0] > 0 else 0
+        if forward_reward > 0.5:
+            forward_reward = forward_reward * self.forward_motion_reward
+        else:
+            forward_reward = forward_reward * 0.5
+
+        # # Penalization of too high torque on the joints
+        torques = self.sim.get_moving_joints_torques(self.agent.robot_agent)
+        torque_penalty = (
+            -1
+            * np.sum(torque**2 for torque in torques)
+            * self.torque_penalty
+            * (self.current_difficulty * 100.0)
+        )
+
+        # # Orientation Penalty
+        orientation = (
+            2.0
+            * self.current_difficulty
+            * unbounded_orientation_cost(
+                current_orientation=[
+                    self.sim.get_pitch_angle(self.agent.robot_agent),
+                    self.sim.get_roll_angle(self.agent.robot_agent),
+                ],
+                desired_orientation=np.array([self.start_pitch, self.start_roll]),
+                lower_threshold_deg=5,
+                weight_per_axis=np.array([2.0, 1.0]),
+            )
         )
 
         # Reward the x position
-        x_position_reward = achieved_goal[0] * self.x_position_reward
-
-        # Penalization of too high torque on the joints
-        torques = self.sim.get_moving_joints_torques(self.agent.robot_agent)
-        torque_penalty = (
-            -1 * np.sum(torque**2 for torque in torques) * self.torque_penalty
+        x_position_reward = (
+            self.x_position_reward * (achieved_goal[0] - self.odl_x)
+            if achieved_goal[0] > self.odl_x
+            else 0
         )
+        self.odl_x = achieved_goal[0]
 
-        # Orientation Penalty
-        orientation = unbounded_orientation_cost(
-            current_orientation=[
-                self.sim.get_pitch_angle(self.agent.robot_agent),
-                self.sim.get_roll_angle(self.agent.robot_agent),
-            ],
-            desired_orientation=np.array([self.start_pitch, self.start_roll]),
-            lower_threshold_deg=15,
-        )
-        # Penalize jumping and keeping more than 2 legs off the ground
         if np.sum(achieved_goal[-4:] < 0) > 2:
-            liftoff_penalty = -0.2 * np.sum((achieved_goal[-4:] == -1))
-            forward_reward = forward_reward * (1 - 0.2 * np.sum(achieved_goal[-4:] < 0))
-        else:
-            liftoff_penalty = 0
-
-        z_penalty = -0.1 * agent_velocity[2] ** 2
+            forward_reward = forward_reward * (
+                1 - 0.23 * np.sum(achieved_goal[-4:] < 0)
+            )
+            x_position_reward = x_position_reward * (
+                1 - 0.23 * np.sum(achieved_goal[-4:] < 0)
+            )
 
         # Penalize jumping and falling
         if info.get("is_terminated"):
@@ -118,14 +143,18 @@ class WalkingTelosTask:
         else:
             fall_reward = 0
 
+        if self.x_successful_threshold < achieved_goal[0]:
+            success = 25
+        else:
+            success = 0
+
         reward = (
             forward_reward
             + torque_penalty
             + orientation
             + fall_reward
-            + liftoff_penalty
+            + success
             + x_position_reward
-            + z_penalty
         )
 
         return reward

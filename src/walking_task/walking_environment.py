@@ -37,9 +37,17 @@ class WalkingTelosTaskEnv(gym.Env):
         self.action_space = gym.spaces.Box(
             low=tj.REL_LOW_ANGLES,
             high=tj.REL_HIGH_ANGLES,
-            shape=(12,),
-            dtype=np.float32,
+            shape=(len(tj.MOVING_JOINTS),),
+            dtype=np.float16,
         )
+
+        ### Curriculum learning
+        self.max_difficulty = 1.0
+        self.current_difficulty = 0.005
+
+    def set_difficulty(self, difficulty: float):
+        self.current_difficulty = difficulty
+        self.task.set_difficulty(difficulty)
 
     def reset_plane(self):
         theta = np.random.uniform(

@@ -3,7 +3,13 @@ import numpy as np
 from typing import List, Tuple
 
 import pybullet as p
-from src.utils.telos_joints import DEFAULT_ANGLES, MOVING_JOINTS, DEFAULT_MOVING_ANGLES
+from src.utils.telos_joints import (
+    DEFAULT_ANGLES,
+    MOVING_JOINTS,
+    DEFAULT_MOVING_ANGLES,
+    HIP_IDX,
+    TIP_IDX,
+)
 from src.utils.helper import load_yaml
 from src.utils.PyBullet import PyBullet
 
@@ -35,7 +41,7 @@ class TelosAgent:
         self.reset_angles()
 
         ## leg sensing also static for now
-        self._leg_tip_indices = [3, 7, 11, 15]
+        self._leg_tip_indices = TIP_IDX
 
         ## For now static values to test
         self.max_ray_length = 2.0  # m
@@ -51,7 +57,7 @@ class TelosAgent:
 
     def reset_angles(self):
         default_angles = self.default_angles.copy()
-        for joint in range(16):
+        for joint in range(len(DEFAULT_ANGLES)):
             self.sim.reset_joint_state(
                 self.robot_agent,
                 joint,
@@ -63,7 +69,7 @@ class TelosAgent:
             self.robot_agent, self.start_pos, self.cube_start_orientation
         )
         self.reset_angles()
-        self.sim.reset_joints_force(self.robot_agent, range(16))
+        self.sim.reset_joints_force(self.robot_agent, range(len(DEFAULT_ANGLES)))
 
     def get_moving_joints_torques(self):
         return np.array(self.sim.get_moving_joints_torques(self.robot_agent))
@@ -73,7 +79,13 @@ class TelosAgent:
             self.robot_agent,
             MOVING_JOINTS,
             self.default_moving_angles
-            + action,  # ACTION IS DEVITAION FROM DEFAULT ANGLE
+            + action,  # ACTION IS DEVIATION FROM DEFAULT ANGLE
+        )
+        # Forgive me for the following code
+        self.sim.control_joints_with_Kp(
+            self.robot_agent,
+            HIP_IDX,
+            [self.default_angles[i] for i in HIP_IDX],
         )
 
     def get_obs(self, plane_id=None):
@@ -99,9 +111,12 @@ class TelosAgent:
         if plane_id is not None:
             end_effector_pos = []
             # Get leg tip positions (this time correctly :))
-            for knee_joint_id in self._leg_tip_indices:
+            for end_leg_sensing_link in self._leg_tip_indices:
                 points = self.sim.get_closest_point_to_plane(
-                    self.robot_agent, plane_id, knee_joint_id, self.liftoff_height
+                    self.robot_agent,
+                    plane_id,
+                    end_leg_sensing_link,
+                    self.liftoff_height,
                 )
                 if points:
                     end_effector_pos.extend(points[0][5])

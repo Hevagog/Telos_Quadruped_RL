@@ -9,25 +9,24 @@ pybullet:
     max_robot_angular_velocity: 10 #rad/s
     max_robot_torque: 10 #Nm
 
-
-    urdf_path: "/urdf/tt.urdf"
+    urdf_path: "/urdf/tt_2.urdf"
     # start_position: [0, 0, 0.173] # STANDING TASK
     start_position: [0, 0, 0.29] # WALKING TASK
     start_orientation: [1.5707963267948966, 0, -3.1415926535897932]
-    liftoff_height: 0.0025
+    liftoff_height: 0.022
     # Motor parameters
-    power: 2 #Watt 
+    power: 1 #Watt # Earlier 2 
     max_velocity: 0.5235987755982988 #rad/s
     transmission_ratio: 1.5
 task:
   # TERMINATORS:
-  fall_threshold: 0.13
+  fall_threshold: 0.13 #0.15 was earlier
 
   goal_radius: 5
   goal_angle_bounds: [-45, 45]
   smoothing_factor: 0.9
   distance_threshold: 0.1
-  fall_reward: -10.0
+  fall_reward: -4.0 # Try -15.0 or -20.0
   forward_velocity_bias: 0.8
   pitch_bias: 20
   max_angle_dip: 0.785398 # RADIANS!
@@ -54,18 +53,18 @@ standing_task:
 walking_task:
 # TERMINATORS:
   max_pitch_angle: 0.523599 # RADIANS!
-  max_roll_angle: 0.349066 # RADIANS!
+  max_roll_angle: 0.523599 # RADIANS!
   max_yaw_angle: 0.785398 # RADIANS!
   up_threshold: 0.4
-  x_backward_threshold: -0.1
+  x_backward_threshold: -0.2
+  max_x_position: 20.0
 
-  x_position_reward: 5.0
-  forward_motion_reward: 4.0
+  x_position_reward: 15.0 # Earlier 10.0
+  forward_motion_reward: 15.0
   optimal_z_height: 0.28
   distance_threshold: 0.1
   max_angle_dev: 5
-  torque_penalty: 0.001
-
+  torque_penalty: 0.00001 # Earlier 0.005
 
 rmps:
   force_vector_empahsis: [0.75, 1.5, 0.75]
