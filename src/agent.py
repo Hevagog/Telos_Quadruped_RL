@@ -121,7 +121,7 @@ class TelosAgent:
                 if points:
                     end_effector_pos.extend(points[0][5])
                 else:
-                    end_effector_pos.extend(-1 * np.ones(3))
+                    end_effector_pos.extend(-100 * np.ones(3))
             observation.extend(end_effector_pos)
 
         return np.array(observation, dtype=np.float32)

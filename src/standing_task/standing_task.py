@@ -28,7 +28,9 @@ class StandingTelosTask:
         self.time_emphasis = _config["standing_task"]["time_emphasis"]
         self.time_threshold = _config["standing_task"]["time_threshold"]
         self.angle_dip_bias = _config["standing_task"]["angle_dip_bias"]
+        self.torque_penalty = _config["standing_task"]["torque_penalty"]
         self.jump_penalty = _config["standing_task"]["jump_penalty"]
+        self.max_robot_torque = _config["pybullet"]["robot"]["max_robot_torque"]
         self.angular_velocity_penalty = _config["standing_task"][
             "angular_velocity_penalty"
         ]
@@ -73,28 +75,26 @@ class StandingTelosTask:
         return time.time() - self._in_goal_pos_start_time
 
     def is_terminated(self, agent_pos: np.ndarray) -> bool:
-        max_angle_diff = np.max(
-            np.abs(
-                self._agent_starting_orientation[:2]
-                - self.sim.get_orientation(self.agent.robot_agent)[:2]
-            )
+        roll_angle = abs(
+            self.sim.get_roll_angle(self.agent.robot_agent) - self.start_roll
         )
-
+        pitch_angle = abs(
+            self.sim.get_pitch_angle(self.agent.robot_agent) - self.start_pitch
+        )
+        yaw_angle = abs(
+            abs(self.sim.get_yaw_angle(self.agent.robot_agent)) - abs(self.start_yaw)
+        )
         is_terminated = (
-            max_angle_diff > self.max_angle_dip
+            # Tipping over
+            pitch_angle > self.max_angle_dip
+            or self.max_angle_dip < roll_angle
+            or self.max_angle_dip < yaw_angle
+            # Falling or Jumping
             or self.agent.get_obs()[2] < self.fall_threshold
             or self.up_threshold < self.agent.get_obs()[2]
-            or max(abs(self.agent.get_joints_velocities()))
-            > self.max_robot_angular_velocity
+            # Cap on max torque
+            or max(abs(self.agent.get_moving_joints_torques())) > self.max_robot_torque
         )
-
-        if (np.abs(agent_pos - self.goal) < self.dist_threshold).all():
-            if self._in_goal_pos_start_time is None:
-                self._in_goal_pos_start_time = time.time()
-            if self.get_in_goal_pos_time() > self.time_threshold:
-                is_terminated = True
-        else:
-            self._in_goal_pos_start_time = None
 
         return is_terminated
 
@@ -107,10 +107,14 @@ class StandingTelosTask:
         position_penalty = np.abs(achieved_goal[:3] - self.goal)
         position_penalty = np.sum(position_penalty)
 
-        if (np.abs(achieved_goal[:3] - self.goal) < self.dist_threshold).all():
+        num_legs_touching_ground = np.sum((achieved_goal[-4:] < -10))
+
+        if (
+            np.abs(achieved_goal[:3] - self.goal) < self.dist_threshold
+        ).all() and num_legs_touching_ground >= 3:
             position_reward = self.good_position_reward - position_penalty
         else:
-            position_reward = -1 * ((position_penalty * 10) ** 2)
+            position_reward = -1 * (abs(position_penalty * 10))
             # position_reward = (
             #     self.get_in_goal_pos_time()
             #     * (self.good_position_reward - position_penalty)
@@ -118,31 +122,28 @@ class StandingTelosTask:
             #     else self.good_position_reward - position_penalty
             # )
 
-        if achieved_goal[2] > self.goal[2]:
-            jumping_cost = (
-                2 * self.sim.get_body_velocity(self.agent.robot_agent, 0)[2]
-            ) ** 2
-        else:
-            jumping_cost = max(
-                0, min(1, abs(self.sim.get_body_velocity(self.agent.robot_agent, 0)[2]))
-            )
-        orientation_cost_reward = orientation_cost(
-            current_orientation=self.sim.get_orientation(self.agent.robot_agent)[:2],
-            desired_orientation=np.array([self.start_pitch, self.start_roll]),
+        torques = self.sim.get_moving_joints_torques(self.agent.robot_agent)
+        torque_penalty = (
+            -1 * np.sum(torque**2 for torque in torques) * self.torque_penalty
         )
 
-        jumping_component = -self.jump_penalty * jumping_cost
-        orientation_component = self.angle_dip_bias * orientation_cost_reward
+        orientation = unbounded_orientation_cost(
+            current_orientation=[
+                self.sim.get_pitch_angle(self.agent.robot_agent),
+                self.sim.get_roll_angle(self.agent.robot_agent),
+            ],
+            desired_orientation=np.array([self.start_pitch, self.start_roll]),
+            lower_threshold_deg=10,
+            weight_per_axis=np.array([0.75, 0.5]),
+        )
 
-        liftoff_penalty = np.sum((achieved_goal[-4:] == -1) * -10)
+        if info.get("is_terminated"):
+            fall_reward = self.fall_reward
+        else:
+            fall_reward = 0.1
 
         # Sum all components to get the final reward
-        reward = (
-            position_reward
-            + jumping_component
-            + orientation_component
-            + liftoff_penalty
-        )
+        reward = position_reward + torque_penalty + orientation + fall_reward
         return reward
 
         # standing_f, _ = rmp_standing(

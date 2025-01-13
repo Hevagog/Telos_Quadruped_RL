@@ -1,10 +1,8 @@
-from sb3_contrib import TQC
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import VecNormalize
-from stable_baselines3 import SAC, PPO
-from stable_baselines3.common.env_checker import check_env
-import torch as th
 import numpy as np
+from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.noise import NormalActionNoise
+from stable_baselines3.common.vec_env import VecNormalize
+from stable_baselines3 import SAC
 
 from stable_baselines3.common.callbacks import CheckpointCallback, BaseCallback
 from src.agent import TelosAgent
@@ -56,7 +54,7 @@ if __name__ == "__main__":
     telos_agent = TelosAgent(pb)
     telos_task = WalkingTelosTask(agent=telos_agent, sim_engine=pb)
     telos_env = WalkingTelosTaskEnv(task=telos_task, agent=telos_agent, sim_engine=pb)
-    n_steps, n_envs = 8192, 32
+    n_steps, n_envs = 8192, 64
     env = make_vec_env(
         make_walking_env,
         n_envs=n_envs,
@@ -64,38 +62,46 @@ if __name__ == "__main__":
     )
     env = VecNormalize(env, norm_obs=True, norm_reward=True)
 
-    policy_ppo = {
-        "net_arch": dict(pi=[512, 512, 256], vf=[512, 512, 256]),
-        "activation_fn": th.nn.Softsign,
-    }
-    name = "n_ppo_sensing_walking_01"
+    n_actions = env.action_space.shape[-1]
+
+    action_noise = NormalActionNoise(
+        mean=np.zeros(n_actions), sigma=0.002 * np.ones(n_actions)
+    )
+
+    policy_sac = dict(net_arch=dict(pi=[512, 512, 256], qf=[512, 512, 256]))
+
+    name = "simple_sac_walking_00_noise_gamma"
 
     checkpoint_callback = CheckpointCallback(
-        save_freq=int(5_000_000 / n_envs),  # every 5_000_000 steps
-        save_path="./checkpoint/",
+        save_freq=int(2_000_000 / n_envs),  # roughly every 2_000_000 steps
+        save_path="./checkpoints/",
         name_prefix=name,
         save_vecnormalize=True,
     )
 
     curriculum_callback = CurriculumCallback(vec_env=env, verbose=0)
 
-    model_ppo = PPO(
+    model_sac = SAC(
         policy="MultiInputPolicy",
         env=env,
-        policy_kwargs=policy_ppo,
-        verbose=1,
-        learning_rate=0.0002,
-        n_steps=n_steps,
-        batch_size=n_steps * n_envs,
-        n_epochs=5,
-        gamma=0.9988,
-        tensorboard_log="./tensorboard/n_ppoTelos/",
+        policy_kwargs=policy_sac,
+        learning_rate=2e-4,
+        buffer_size=int(1e6),
+        batch_size=2048 * 8,
+        ent_coef="auto",
+        gamma=0.997,  # 0.9988 like in the paper
+        train_freq=1,
+        gradient_steps=1,
+        action_noise=action_noise,
+        target_update_interval=1,
+        verbose=0,
+        tensorboard_log="./tensorboard/n_sacTelos/",
     )
 
+    # callback = CallbackList([custom_callback, checkpoint_callback])
+
     try:
-        model_ppo.learn(
-            120_000_000, callback=[checkpoint_callback, curriculum_callback]
-        )
-        model_ppo.save(name)
+        model_sac.learn(60_000_000, callback=[checkpoint_callback, curriculum_callback])
+        model_sac.save(name)
     except KeyboardInterrupt:
-        model_ppo.save(name)
+        model_sac.save(name)

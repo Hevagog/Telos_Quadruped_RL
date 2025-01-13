@@ -6,6 +6,8 @@ from src.standing_task.standing_environment import (
 )
 from src.utils.PyBullet import PyBullet
 from sb3_contrib import TQC
+from stable_baselines3.common.noise import NormalActionNoise
+import numpy as np
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import VecNormalize
 from stable_baselines3 import SAC, PPO
@@ -25,6 +27,11 @@ if __name__ == "__main__":
     )
     env = VecNormalize(env, norm_obs=True, norm_reward=True)
 
+    n_actions = env.action_space.shape[-1]
+    action_noise = NormalActionNoise(
+        mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions)
+    )
+
     policy_tqc = dict(
         net_arch=dict(pi=[512, 512, 512], qf=[512, 512, 512]),
         n_critics=12,
@@ -38,15 +45,15 @@ if __name__ == "__main__":
         verbose=1,
         learning_rate=1e-4,
         ent_coef="auto",
-        buffer_size=1_200_000,
+        buffer_size=2_400_000,
         learning_starts=5_000,
-        batch_size=2048,
+        batch_size=4096,
         tau=0.005,
         gamma=0.995,
         train_freq=1,
         gradient_steps=1,
         target_entropy="auto",
-        action_noise=None,
+        action_noise=action_noise,
         tensorboard_log="./tensorboard/tqcTelos/",
     )
 

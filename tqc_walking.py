@@ -1,10 +1,9 @@
-from sb3_contrib import TQC
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import VecNormalize
-from stable_baselines3 import SAC, PPO
-from stable_baselines3.common.env_checker import check_env
-import torch as th
 import numpy as np
+from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.noise import NormalActionNoise
+from stable_baselines3.common.vec_env import VecNormalize
+from stable_baselines3 import SAC
+from sb3_contrib import TQC
 
 from stable_baselines3.common.callbacks import CheckpointCallback, BaseCallback
 from src.agent import TelosAgent
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     telos_agent = TelosAgent(pb)
     telos_task = WalkingTelosTask(agent=telos_agent, sim_engine=pb)
     telos_env = WalkingTelosTaskEnv(task=telos_task, agent=telos_agent, sim_engine=pb)
-    n_steps, n_envs = 8192, 32
+    n_envs = 16
     env = make_vec_env(
         make_walking_env,
         n_envs=n_envs,
@@ -64,38 +63,48 @@ if __name__ == "__main__":
     )
     env = VecNormalize(env, norm_obs=True, norm_reward=True)
 
-    policy_ppo = {
-        "net_arch": dict(pi=[512, 512, 256], vf=[512, 512, 256]),
-        "activation_fn": th.nn.Softsign,
-    }
-    name = "n_ppo_sensing_walking_01"
+    n_actions = env.action_space.shape[-1]
+
+    # action_noise = NormalActionNoise(
+    #     mean=np.zeros(n_actions), sigma=0.002 * np.ones(n_actions)
+    # )
+
+    policy_tqc = dict(
+        net_arch=dict(pi=[512, 512, 256], qf=[512, 512, 256]),
+        n_critics=8,
+        n_quantiles=25,
+    )
+
+    model = TQC(
+        "MultiInputPolicy",
+        env,
+        policy_kwargs=policy_tqc,
+        verbose=0,
+        learning_rate=1e-4,
+        ent_coef="auto",
+        buffer_size=2_400_000,
+        learning_starts=5_000,
+        batch_size=2 * 2048,
+        gamma=0.997,
+        train_freq=1,
+        gradient_steps=1,
+        target_entropy="auto",
+        # action_noise=action_noise,
+        tensorboard_log="./tensorboard/tqcTelos/",
+    )
+
+    name = "simple_tqc_walking_00_no_noise"
 
     checkpoint_callback = CheckpointCallback(
-        save_freq=int(5_000_000 / n_envs),  # every 5_000_000 steps
-        save_path="./checkpoint/",
+        save_freq=int(500_000 / n_envs),  # roughly every 500_000 steps
+        save_path="./checkpoints/",
         name_prefix=name,
         save_vecnormalize=True,
     )
-
     curriculum_callback = CurriculumCallback(vec_env=env, verbose=0)
 
-    model_ppo = PPO(
-        policy="MultiInputPolicy",
-        env=env,
-        policy_kwargs=policy_ppo,
-        verbose=1,
-        learning_rate=0.0002,
-        n_steps=n_steps,
-        batch_size=n_steps * n_envs,
-        n_epochs=5,
-        gamma=0.9988,
-        tensorboard_log="./tensorboard/n_ppoTelos/",
-    )
-
     try:
-        model_ppo.learn(
-            120_000_000, callback=[checkpoint_callback, curriculum_callback]
-        )
-        model_ppo.save(name)
+        model.learn(25_000_000, callback=[checkpoint_callback, curriculum_callback])
+        model.save(name)
     except KeyboardInterrupt:
-        model_ppo.save(name)
+        model.save(name)
