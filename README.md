@@ -42,7 +42,10 @@ The repository contains several key Python scripts:
 
 The training process yielded agents capable of demonstrating a forward walking gait. The `combined_gaits.png` image visualizes the X-Y trajectory of the robot's base when controlled by agents trained with PPO, SAC, and TQC.
 
-![Robot Gaits](./combined_gaits.png "Comparison of Gaits from PPO, SAC, and TQC agents")
+<p align="center">
+    <img src="img/combined_gaits.png" alt="Robot Gaits" title="Comparison of Gaits from PPO, SAC, and TQC agents">
+</p>
+
 
 *   **PPO (Blue):** Shows a particular trajectory, indicating the learned locomotion pattern.
 *   **SAC (Green):** Displays a different path, potentially highlighting variations in stability or step strategy compared to PPO.
