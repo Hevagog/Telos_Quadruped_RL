@@ -23,7 +23,7 @@ The primary algorithms investigated include:
 ### Development Environment & Tools:
 The development heavily relied on a suite of powerful tools and libraries:
 *   **PyBullet:** Utilized for creating a custom, realistic simulation environment for the quadruped robot, allowing for rapid prototyping and training without the need for physical hardware.
-*   **Gymnasium (formerly Gym):** Provided the standardized interface for developing the custom reinforcement learning environments, ensuring compatibility with RL libraries.
+*   **Gymnasium:** Provided the standardized interface for developing the custom reinforcement learning environments, ensuring compatibility with RL libraries.
 *   **Stable Baselines3 (SB3):** Served as the backbone for implementing and experimenting with the PPO, SAC, and TQC algorithms. Its well-structured and optimized implementations were crucial for training the agents.
 
 The process involved a deep dive into designing custom RL environments, including defining observation and action spaces, crafting reward functions conducive to learning a stable walking gait, and implementing curriculum learning strategies (as seen in `CurriculumCallback` within the training scripts) to gradually increase task difficulty.
@@ -47,5 +47,3 @@ The training process yielded agents capable of demonstrating a forward walking g
 *   **PPO (Blue):** Shows a particular trajectory, indicating the learned locomotion pattern.
 *   **SAC (Green):** Displays a different path, potentially highlighting variations in stability or step strategy compared to PPO.
 *   **TQC (Red):** Illustrates its learned gait, which appears to cover more ground in the X-direction and exhibits a wider side-to-side (Y) motion compared to the others in this particular visualization.
-
-These visual results offer a qualitative comparison of the behaviors learned by the different RL algorithms under the defined environment and reward structure. The journey underscored the complexities of RL in robotics, from hyperparameter tuning to reward shaping, and provided invaluable experience in applying these techniques to a challenging locomotion task.
